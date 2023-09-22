@@ -62,25 +62,23 @@ let starWarsfilmRepo = (function () {
     }
 
 
-    function loadPlanetInfo() {
+    function loadPlanetInfo(film) {
         let ulList = document.querySelector('#filmsWithPlanets');
 
-        filmList.forEach(function (film) {
-            const li = document.createElement('li');
-            li.textContent = `${film.title} (episode: ${film.episode})`;
-            ulList.appendChild(li);
+        const li = document.createElement('li');
+        li.textContent = `${film.title} (episode: ${film.episode})`;
+        ulList.appendChild(li);
 
-            let planetList = document.createElement('ul');
+        let planetList = document.createElement('ul');
 
-            film.planets.forEach(function (planetURL) {
-                fetchPlanetInfo(planetURL).then(function (planetData) {
-                    const liPlanet = document.createElement('li');
-                    liPlanet.textContent = planetData.name;
-                    planetList.appendChild(liPlanet);
-                });
+        film.planets.forEach(function (planetURL) {
+            fetchPlanetInfo(planetURL).then(function (planetData) {
+                const liPlanet = document.createElement('li');
+                liPlanet.textContent = planetData.name;
+                planetList.appendChild(liPlanet);
             });
-            ulList.appendChild(planetList);
         });
+        ulList.appendChild(planetList);
     }
 
 
@@ -112,7 +110,7 @@ starWarsfilmRepo.loadList().then(function () {
     });
 
     sortedFilmList.forEach(function (film) {
-        starWarsfilmRepo.loadPlanetInfo();
+        starWarsfilmRepo.loadPlanetInfo(film);
     });
 });
 
