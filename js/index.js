@@ -25,11 +25,10 @@ let starWarsfilmRepo = (function () {
 
     //return the list of films
     function getAll() {
-        console.log("Not sorted filmlist", filmList);
         return filmList;
     }
 
-    //add film titles to the HTML list <ul>
+    //add film titles to the first list
     function addListItem(film) {
         let ulList = document.querySelector('#filmList');
         let li = document.createElement('li');
@@ -42,11 +41,10 @@ let starWarsfilmRepo = (function () {
         const sortedFilmList = [...filmList].sort((a, b) => {
             return a.episode - b.episode;
         });
-        console.log("Sorted Film List:", sortedFilmList);
         return sortedFilmList;
     }
 
-    //print a sorted list of films in HTML
+    //add film titles to the second list
     function addSortedListItem(film) {
         let ulList = document.querySelector('#sortedFilmList');
         let li = document.createElement('li');
@@ -54,14 +52,14 @@ let starWarsfilmRepo = (function () {
         ulList.appendChild(li);
     }
 
-
+    //fetch planet information
     function fetchPlanetInfo(planetURL) {
         return fetch(planetURL).then(function (response) {
             return response.json();
         })
     }
 
-
+    //add film titles and planet names to the third list
     function loadPlanetInfo(film) {
         let ulList = document.querySelector('#filmsWithPlanets');
 
@@ -82,8 +80,6 @@ let starWarsfilmRepo = (function () {
     }
 
 
-
-
     return {
         loadList: loadList,
         getAll: getAll,
@@ -99,14 +95,14 @@ let starWarsfilmRepo = (function () {
 
 
 starWarsfilmRepo.loadList().then(function () {
-    const sortedFilmList = starWarsfilmRepo.sortByEpisode(); // Sort the film list by episode
+    const sortedFilmList = starWarsfilmRepo.sortByEpisode();
 
     starWarsfilmRepo.getAll().forEach(function (film) {
         starWarsfilmRepo.addListItem(film);
     });
 
     sortedFilmList.forEach(function (film) {
-        starWarsfilmRepo.addSortedListItem(film); // Add films to the sorted list
+        starWarsfilmRepo.addSortedListItem(film);
     });
 
     sortedFilmList.forEach(function (film) {
