@@ -55,13 +55,6 @@ let starWarsfilmRepo = (function () {
     }
 
 
-
-    function getPlanetURL(film) {
-        console.log(film.planets)
-        return film.planets;
-    }
-
-
     function fetchPlanetInfo(planetURL) {
         return fetch(planetURL).then(function (response) {
             return response.json();
@@ -69,32 +62,25 @@ let starWarsfilmRepo = (function () {
     }
 
 
-    function loadPlanetInfo(film, planetURL) {
-
+    function loadPlanetInfo() {
         let ulList = document.querySelector('#filmsWithPlanets');
 
         filmList.forEach(function (film) {
-            let planetURLs = getPlanetURL(film);
+            const li = document.createElement('li');
+            li.textContent = `${film.title} (episode: ${film.episode})`;
+            ulList.appendChild(li);
+
             let planetList = document.createElement('ul');
 
-            planetURLs.forEach(function (planetURL) {
+            film.planets.forEach(function (planetURL) {
                 fetchPlanetInfo(planetURL).then(function (planetData) {
-                    // Create a list item for each planet and add it to the planetList
                     const liPlanet = document.createElement('li');
                     liPlanet.textContent = planetData.name;
                     planetList.appendChild(liPlanet);
-                }).catch(function (e) {
-                    console.error(e)
-                })
+                });
             });
-
-            // Create a list item for the film and its planets
-            const li = document.createElement('li');
-            li.textContent = `${film.title} (episode: ${film.episode})`;
-
-            ulList.appendChild(li);
             ulList.appendChild(planetList);
-        })
+        });
     }
 
 
@@ -106,7 +92,6 @@ let starWarsfilmRepo = (function () {
         addListItem: addListItem,
         sortByEpisode: sortByEpisode,
         addSortedListItem: addSortedListItem,
-        getPlanetURLs: getPlanetURL,
         fetchPlanetInfo: fetchPlanetInfo,
         loadPlanetInfo: loadPlanetInfo
 
@@ -127,7 +112,6 @@ starWarsfilmRepo.loadList().then(function () {
     });
 
     sortedFilmList.forEach(function (film) {
-        starWarsfilmRepo.getPlanetURLs(film);
         starWarsfilmRepo.loadPlanetInfo();
     });
 });
