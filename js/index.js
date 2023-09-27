@@ -1,15 +1,17 @@
 let starWarsfilmRepo = (function () {
 
     const apiUrl = "https://swapi.dev/api/films/?format=json";
-    const filmList = [];
+    let filmList = [];
 
 
 
     //fetching the film data from URL
-    function loadList() {
+    function fetchList() {
         return fetch(apiUrl).then(function (response) {
             return response.json();
         }).then(function (json) {
+            // Clear the existing filmList before populating it
+            filmList = [];
             json.results.forEach(function (item) {
                 let film = {
                     title: item.title,
@@ -23,17 +25,16 @@ let starWarsfilmRepo = (function () {
         })
     }
 
+    //fetch planet information
+    function fetchPlanetInfo(planetURL) {
+        return fetch(planetURL).then(function (response) {
+            return response.json();
+        })
+    }
+
     //return the list of films
     function getAll() {
         return filmList;
-    }
-
-    //add film titles to the first list
-    function addListItem(film) {
-        let ulList = document.querySelector('#filmList');
-        let li = document.createElement('li');
-        li.textContent = film.title;
-        ulList.appendChild(li);
     }
 
     //sort films by episode 
@@ -44,28 +45,23 @@ let starWarsfilmRepo = (function () {
         return sortedFilmList;
     }
 
-    //add film titles to the second list
-    function addSortedListItem(film) {
-        let ulList = document.querySelector('#sortedFilmList');
-        let li = document.createElement('li');
-        li.textContent = `${film.title} (episode: ${film.episode})`;
-        ulList.appendChild(li);
-    }
-
-    //fetch planet information
-    function fetchPlanetInfo(planetURL) {
-        return fetch(planetURL).then(function (response) {
-            return response.json();
-        })
+    function addListItem(listData, list) {
+        if (listData.length !== 0) {
+            listData.forEach((film) => {
+                let li = document.createElement('li');
+                li.textContent = `${film.title} (episode: ${film.episode})`;
+                list.appendChild(li);
+            })
+        }
     }
 
     //add film titles and planet names to the third list
     function loadPlanetInfo(film) {
-        let ulList = document.querySelector('#filmsWithPlanets');
+        let filmsWithPlanets = document.querySelector('#filmsWithPlanets');
 
         const li = document.createElement('li');
         li.textContent = `${film.title} (episode: ${film.episode})`;
-        ulList.appendChild(li);
+        filmsWithPlanets.appendChild(li);
 
         let planetList = document.createElement('ul');
 
@@ -76,35 +72,34 @@ let starWarsfilmRepo = (function () {
                 planetList.appendChild(liPlanet);
             });
         });
-        ulList.appendChild(planetList);
+        filmsWithPlanets.appendChild(planetList);
     }
 
 
     return {
-        loadList: loadList,
-        getAll: getAll,
-        addListItem: addListItem,
-        sortByEpisode: sortByEpisode,
-        addSortedListItem: addSortedListItem,
-        fetchPlanetInfo: fetchPlanetInfo,
-        loadPlanetInfo: loadPlanetInfo
-
-    }
-
+        fetchList,
+        getAll,
+        addListItem,
+        sortByEpisode,
+        fetchPlanetInfo,
+        loadPlanetInfo
+    };
 })();
 
 
-starWarsfilmRepo.loadList().then(function () {
+starWarsfilmRepo.fetchList().then(function () {
+    const filmList = starWarsfilmRepo.getAll();
     const sortedFilmList = starWarsfilmRepo.sortByEpisode();
+    let filmUlList = document.querySelector('#filmList');
+    let sortedFilmUlList = document.querySelector('#sortedFilmList');
 
-    starWarsfilmRepo.getAll().forEach(function (film) {
-        starWarsfilmRepo.addListItem(film);
-    });
+    // Get filmlist without sorting
+    starWarsfilmRepo.addListItem(filmList, filmUlList);
 
-    sortedFilmList.forEach(function (film) {
-        starWarsfilmRepo.addSortedListItem(film);
-    });
+    // Get filmlist after sorting
+    starWarsfilmRepo.addListItem(sortedFilmList, sortedFilmUlList);
 
+    // Load information about each planet from the sorted filmlist
     sortedFilmList.forEach(function (film) {
         starWarsfilmRepo.loadPlanetInfo(film);
     });
