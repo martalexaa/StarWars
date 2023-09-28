@@ -3,10 +3,19 @@ let starWarsfilmRepo = (function () {
     const apiUrl = "https://swapi.dev/api/films/?format=json";
     let filmList = [];
 
+    // Function to show loading message
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+    }
 
+    // Function to hide loading message
+    function hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+    }
 
     //fetching the film data from URL
     function fetchList() {
+        showLoading();
         return fetch(apiUrl).then(function (response) {
             return response.json();
         }).then(function (json) {
@@ -19,6 +28,7 @@ let starWarsfilmRepo = (function () {
                     planets: item.planets
                 };
                 filmList.push(film);
+                hideLoading();
             });
         }).catch(function (e) {
             console.error(e);
@@ -32,12 +42,12 @@ let starWarsfilmRepo = (function () {
         })
     }
 
-    //return the list of films
+    // Return the list of films
     function getAll() {
         return filmList;
     }
 
-    //sort films by episode 
+    // Sort films by episode 
     function sortByEpisode() {
         const sortedFilmList = [...filmList].sort((a, b) => {
             return a.episode - b.episode;
@@ -45,6 +55,7 @@ let starWarsfilmRepo = (function () {
         return sortedFilmList;
     }
 
+    // Add item to the HTML list
     function addListItem(listData, list) {
         if (listData.length !== 0) {
             listData.forEach((film) => {
@@ -55,14 +66,16 @@ let starWarsfilmRepo = (function () {
         }
     }
 
-    //add film titles and planet names to the third list
-    function loadPlanetInfo(film) {
-        let filmsWithPlanets = document.querySelector('#filmsWithPlanets');
+    // Add film titles and planets to the list
+    function loadPlanetInfo(sortedFilmList, filmsWithPlanets) {
+        sortedFilmList.forEach(function (film) {
+            addListItem([film], filmsWithPlanets); // Pass an array with the current film
+            appendPlanets(film, filmsWithPlanets);
+        });
+    }
 
-        const li = document.createElement('li');
-        li.textContent = `${film.title} (episode: ${film.episode})`;
-        filmsWithPlanets.appendChild(li);
-
+    // Append planet list to each film
+    function appendPlanets(film) {
         let planetList = document.createElement('ul');
 
         film.planets.forEach(function (planetURL) {
@@ -89,9 +102,10 @@ let starWarsfilmRepo = (function () {
 
 starWarsfilmRepo.fetchList().then(function () {
     const filmList = starWarsfilmRepo.getAll();
-    const sortedFilmList = starWarsfilmRepo.sortByEpisode();
+    let sortedFilmList = starWarsfilmRepo.sortByEpisode();
     let filmUlList = document.querySelector('#filmList');
     let sortedFilmUlList = document.querySelector('#sortedFilmList');
+    let filmsWithPlanets = document.querySelector('#filmsWithPlanets');
 
     // Get filmlist without sorting
     starWarsfilmRepo.addListItem(filmList, filmUlList);
@@ -100,8 +114,6 @@ starWarsfilmRepo.fetchList().then(function () {
     starWarsfilmRepo.addListItem(sortedFilmList, sortedFilmUlList);
 
     // Load information about each planet from the sorted filmlist
-    sortedFilmList.forEach(function (film) {
-        starWarsfilmRepo.loadPlanetInfo(film);
-    });
+    starWarsfilmRepo.loadPlanetInfo(sortedFilmList, filmsWithPlanets);
 });
 
