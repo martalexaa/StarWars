@@ -14,11 +14,11 @@ let starWarsfilmRepo = (function () {
     }
 
     //fetching the film data from URL
-    function fetchList() {
-        showLoading();
-        return fetch(apiUrl).then(function (response) {
-            return response.json();
-        }).then(function (json) {
+    async function fetchList() {
+        try {
+            showLoading();
+            const response = await fetch(apiUrl);
+            const json = await response.json();
             // Clear the existing filmList before populating it
             filmList = [];
             json.results.forEach(function (item) {
@@ -28,18 +28,22 @@ let starWarsfilmRepo = (function () {
                     planets: item.planets
                 };
                 filmList.push(film);
-                hideLoading();
             });
-        }).catch(function (e) {
+            hideLoading();
+        } catch (e) {
             console.error(e);
-        })
+            hideLoading();
+        }
     }
 
-    //fetch planet information
-    function fetchPlanetInfo(planetURL) {
-        return fetch(planetURL).then(function (response) {
-            return response.json();
-        })
+    // Fetch planet information
+    async function fetchPlanetInfo(planetURL) {
+        try {
+            const response = await fetch(planetURL);
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     // Return the list of films
